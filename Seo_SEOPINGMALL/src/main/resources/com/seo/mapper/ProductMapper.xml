@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.seo.mapper.ProductMapper">
+
+	<!-- criteria(검색조건) -->
+	<sql id="criteria">
+
+	  	<trim prefix="(" suffix=") AND" prefixOverrides="AND">
+	  		<foreach item="type" collection="typeArr">
+	  			<trim prefix="AND">
+	  				<choose>
+	  					<when test="type == 'S'.toString()">
+	  						<trim prefixOverrides="or">
+			  					<foreach collection="sellerArr" item="sellerId">
+			  						<trim prefix="or">
+			  							sellerId = #{sellerId}
+			  						</trim>
+			  					</foreach>  						
+	  						</trim>
+	  					</when>
+	  					<when test="type == 'C'.toString()">
+	  						cateCode like '%' || #{cateCode} || '%'
+	  					</when>  					
+	  					<when test="type == 'N'.toString()">
+	  						productName like '%' || #{keyword} || '%'
+	  					</when>  					
+	  				</choose>
+	  			</trim>
+	  		</foreach>
+	  	</trim>
+
+	</sql>
+
+	
+	<!-- 상품 검색 -->
+	<select id="getGoodsList" resultType="com.seo.model.ProductVO">
+	
+		<![CDATA[
+		    select * from(
+		        select /*+INDEX_DESC(seo_product SYS_C007585)*/ rownum as rn, productId, productName,
+		            (select sellerName from seo_seller where seo_product.sellerId = seo_seller.sellerId) sellerName, sellerId,
+		            (select cateName from seo_bcate where seo_product.cateCode = seo_bcate.cateCode) cateName,cateCode, maker, makeDate, productPrice,productDiscount  
+		        from seo_product
+		        where 
+	    ]]>
+	    
+	    <include refid="criteria"></include>
+	    
+	    <![CDATA[
+		        rownum <= #{pageNum} * #{amount} 
+	        	)
+	        where rn > (#{pageNum} -1) * #{amount}
+		]]>	  		
+	
+	</select>
+	
+	<!-- 상품 총 개수 -->
+	<select id="goodsGetTotal" resultType="int">
+	
+		select count(*) from seo_product
+		where
+		<include refid="criteria"></include> 
+		productId >0
+		
+	</select>
+	
+	<!-- 판매자 id 리스트 요청 -->
+	<select id="getSellerIdList" resultType="String">
+	
+		select sellerid from seo_seller where sellerName like '%' || #{keyword} || '%'
+	
+	</select>	
+	
+	<!-- 국내 카테고리 리스트 -->
+	<select id="getCateCode1" resultType="com.seo.model.CateVO">
+	<!-- select * from seo_bcate where cateCode > 101001 and cateCode < 200000 -->
+		<![CDATA[
+			
+			
+			SELECT *
+				FROM seo_bcate
+						WHERE cateCode > 100000 AND cateCode < 200000 AND
+     						 cateCode NOT IN (101000, 102000, 103000)
+		]]>
+	</select>
+	
+	
+	<!-- 외국 카테고리 리스트 -->
+	<select id="getCateCode2" resultType="com.seo.model.CateVO">
+	
+	<!-- select * from seo_bcate where cateCode > 200001 and cateCode < 300000 -->
+		<![CDATA[
+			
+					
+					SELECT *
+			FROM seo_bcate
+				WHERE cateCode > 200000 AND cateCode < 300000 AND
+      				cateCode NOT IN (201000, 202000, 203000)
+		]]>
+	
+	</select>		
+	
+	<!-- 검색 대상 카테고리 리스트 -->
+	<select id="getCateList" resultType="String">
+	
+		select DISTINCT cateCode from seo_product where 
+		<foreach item="type" collection="typeArr">		
+  				<choose>
+  					<when test="type == 'S'.toString()">
+  						<trim prefixOverrides="or">
+		  					<foreach collection="sellerArr" item="sellerId">
+		  						<trim prefix="or">
+		  							sellerId = #{sellerId}
+		  						</trim>
+		  					</foreach>  						
+  						</trim>
+  					</when>
+  					<when test="type == 'N'.toString()">
+  						productName like '%' || #{keyword} || '%'
+  					</when>  					
+  				</choose>
+  		</foreach>
+	
+	</select>	
+	
+	<!-- 카테고리 정보(+검색대상 갯수) -->	
+	
+	<select id="getCateInfo" resultType="com.seo.model.CateFilterDTO">
+	
+		select DISTINCT count(*) cateCount, a.cateCode, b.cateName from seo_product a left join seo_bcate b on a.cateCode = b.cateCode
+		
+		where 
+
+		<foreach item="type" collection="typeArr">		
+  				<choose>
+  					<when test="type == 'S'.toString()">
+  					
+  						<trim prefix="(" suffix=")" prefixOverrides="or">
+  						
+		  					<foreach collection="sellerArr" item="sellerId">
+		  					
+		  						<trim prefix="or">
+		  						
+		  							sellerId = #{sellerId}
+		  							
+		  						</trim>
+		  						
+		  					</foreach>
+		  					  						
+  						</trim>
+  						
+  						and a.cateCode = #{cateCode}
+  						
+  					</when>
+  					
+  					<when test="type == 'N'.toString()">
+  					
+  						productName like '%' || #{keyword} || '%' and a.cateCode = #{cateCode}
+  						 
+  					</when>
+  					  					
+  				</choose>
+  		</foreach>
+  		
+  		group by a.cateCode, b.cateName
+	
+	</select>		
+	
+	<!-- 상품 정보 -->
+	<select id="getGoodsInfo" resultType="com.seo.model.ProductVO">
+	
+			select a.PRODUCTID, a.PRODUCTNAME, a.SELLERID, b.SELLERNAME, a.MAKER, a.MAKEDATE, a.CATECODE, c.CATENAME, a.PRODUCTPRICE, a.PRODUCTSTOCK, a.PRODUCTDISCOUNT, a.PRODUCTINTRO, a.PRODUCTCONTENTS
+			from seo_product a left outer join seo_seller b on a.sellerId = b.sellerId
+			left outer join seo_bcate c on a.catecode = c.catecode
+			where productid = ${productId}	
+	
+	</select>	
+	
+	<select id="getProductIdName" resultType="com.seo.model.ProductVO">
+	
+		select productId, productName from seo_product 
+		where productId = #{productId}
+	
+	
+	</select>	
+	
+	<select id="likeSelect" resultType="com.seo.model.SelectDTO">
+	
+		select * from
+		(select rownum as rn, productId, productName, ratingAvg, (select cateName from seo_bcate where seo_product.cateCode = seo_bcate.cateCode) as cateName
+		from seo_product
+		order by ratingAvg desc nulls last)
+		<![CDATA[
+		where rn < 21
+		]]>	
+	
+	</select>	
+	
+		
+	
+  </mapper>
