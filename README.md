@@ -1,4 +1,4 @@
 # SEOPINGMALL
 
-[<http://52.79.148.131:8081>{:target="_blank"}
-
+<http://52.79.148.131:8081>{:target="_blank"}
+{: target="_blank"}
