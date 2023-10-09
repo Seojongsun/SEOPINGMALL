@@ -270,6 +270,7 @@ public class AdminController {
 		}
 		
 		
+		
 		rttr.addFlashAttribute("delete_result", result);
 		
 		return "redirect:/admin/sellerManage";
