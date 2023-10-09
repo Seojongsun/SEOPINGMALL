@@ -10,10 +10,10 @@ public class SellerVO {
 	/* 판매자 이름 */
 	private String sellerName;
 	
-	/* 국가 id */
+	/* 배송지역 id */
 	private String nationId;
 	
-	/* 판매자 국가 */
+	/* 배송지역 국가 */
 	private String nationName;
 	
 	/* 판매자 소개 */

@@ -17,10 +17,10 @@ public class ProductVO {
 	/* 판매자 이름 */
 	private String sellerName;
 	
-	/* 출판일 */
+	/* 제조일 */
 	private String makeDate;
 	
-	/* 출판사 */
+	/* 제조사 */
 	private String maker;
 	
 	/* 카테고리 코드 */

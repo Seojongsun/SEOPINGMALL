@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: com.seo.task.TaskTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 3.301 sec <<< FAILURE! - in com.seo.task.TaskTest
+taskTests(com.seo.task.TaskTest)  Time elapsed: 0.27 sec  <<< ERROR!
+java.lang.NullPointerException
+	at com.seo.task.TaskTest.taskTests(TaskTest.java:76)
+

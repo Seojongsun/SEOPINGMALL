@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.seo.mapper.MemberMapper">
+  
+	<!-- 회원가입 -->  
+  	<insert id="memberJoin">
+  	
+  		insert into seo_member values(#{memberId}, #{memberPw}, #{memberName}, #{memberMail}, #{memberAddr1}, #{memberAddr2}, #{memberAddr3}, 0, sysdate, 10000000, 1000000 )
+
+  	</insert>
+  	
+  	<!-- 아이디 중복검사 -->
+  	<select id="idCheck" resultType="int">
+  	
+  		select count(*) from seo_member where memberId = #{memberId}
+  	
+  	</select>
+  	
+  	<!-- 로그인 -->
+  	<select id="memberLogin" resultType="com.seo.model.MemberVO">
+  	
+  		select memberId, memberPw, memberName, adminck, money, point from seo_member where memberId = #{memberId}
+  		<!-- 기존코드 -->
+  		<!-- select memberId, memberName, adminck, money, point from seo_member where memberId = #{memberId} and memberPw = #{memberPw} -->
+  	
+  	</select>
+  	
+   	<!-- 주문자 정보 -->
+  	<select id="getMemberInfo" resultType="com.seo.model.MemberVO">
+  	
+  		SELECT memberId, memberName, memberMail, memberAddr1, memberAddr2, memberAddr3, money, point 
+  		FROM seo_member 
+  		WHERE memberId = #{memberId}
+  	
+  	</select> 	
+  	
+  	
+  </mapper>
