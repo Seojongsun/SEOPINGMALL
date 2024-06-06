@@ -39,7 +39,7 @@
 		
 			<ul class="list">
 			
-				<c:if test = "${member == null}">	<!-- 로그인 x -->	
+				<c:if test = "${member == null}">	<!-- 로그인 x  -->	
 				
 				
 				
