@@ -228,7 +228,7 @@ var addressCheck = false         // 주소
 
 $(document).ready(function(){
 	
-	//회원가입 버튼(회원가입 기능 작동)
+	//회원가입 버튼(회원가입 기능 작동 )
 	   $(".join_button").click(function(){
 		   
 		   var idCheck = /^[a-zA-Z0-9가-힣ㄱ-ㅎ]{2,12}$/;
